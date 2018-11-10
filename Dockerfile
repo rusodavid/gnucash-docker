@@ -12,4 +12,7 @@ MAINTAINER rusodavid@gmail.com
 ENV DEBIAN_FRONTEND noninteractive
 # RUN apk update && apk add wget && rm -rf /var/cache/apk/* && apk add --no-cache gnucash
 RUN apt-get update -q && apt-get install -y gnucash dbus-x11
+COPY environment.local /etc/gnucash/environment.local
+COPY saved-reports-2.4 /root/.gnucash/saved-reports-2.4
+#COPY net-barchart.scm /usr/share/gnucash/scm/gnucash/report/standard-reports/net-barchart.scm
 ENTRYPOINT ["/usr/bin/gnucash", "--logto", "stderr"]
