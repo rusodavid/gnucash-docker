@@ -1,1 +1,2 @@
-docker restart gnucash 
+xhost +LOCAL:
+docker start gnucash 
