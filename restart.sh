@@ -1,2 +1,2 @@
 xhost +LOCAL:
-docker start gnucash 
+docker start -i gnucash 
