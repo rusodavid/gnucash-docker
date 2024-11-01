@@ -1,9 +1,9 @@
 FROM nvidia-gui-app:latest
 MAINTAINER rusodavid@gmail.com
 
-RUN apt update -y && \ 
- apt upgrade -y && \
- apt install -y git \ 
+RUN apt-get update -y && \ 
+ apt-get upgrade -y && \
+ apt-get install -y git \ 
 	gettext \
 	wget \
 	libglib2.0-dev \
@@ -18,7 +18,6 @@ RUN apt update -y && \
 	guile-2.2-dev \
 	gwenhywfar-tools \
 	libofx-dev \
-	libcanberra-gtk-module \
 	libcanberra-gtk3-module \
 	libgtest-dev \
 	libdbi-dev \
@@ -42,10 +41,11 @@ RUN apt update -y && \
 ENV WORKAREA /src
 ENV BUILDDIR $WORKAREA/build
 ENV SRCDIR $WORKAREA/gnucash
+ENV TAG 5.9
 
 # get the source
 RUN git clone https://github.com/Gnucash/gnucash.git $SRCDIR
-RUN cd $SRCDIR && echo $PWD && git checkout tags/5.4
+RUN cd $SRCDIR && echo $PWD && git checkout tags/$TAG
 
 # build and install
 RUN mkdir -p $BUILDDIR
@@ -68,5 +68,22 @@ RUN /gnucash/bin/gnc-fq-update
 
 #ENV WEBKIT_DISABLE_COMPOSITING_MODE=1
 
+
+# Set up the user
+ARG UNAME=gnucash
+ARG UID=1001
+ARG GID=1002
+ARG HOME=/home/${UNAME}
+ARG GROUP_NAME=developers
+
+RUN addgroup --gid ${GID} ${GROUP_NAME}
+RUN useradd -m -u ${UID} -g ${GID} ${UNAME} && echo "${UNAME}:${GROUP_NAME}" | chpasswd && adduser ${UNAME} sudo
+
+
+#Set up user
+#RUN useradd -ms -g ${GID} /bin/bash ${UNAME}
+USER ${UNAME} 
+WORKDIR ${HOME} 
+
 #ENTRYPOINT ["/bin/bash"]
-ENTRYPOINT ["/usr/bin/gnucash","--logto", "stderr"]
+ENTRYPOINT ["/usr/bin/gnucash"]
